@@ -13,14 +13,14 @@ from OpenstackInventory import OpenstackInventory
 from OvirtInventory import OvirtInventory
 
 filter_classes = {
-    "aws_inv": AWSInventory,
-    "beaker_inv": BeakerInventory,
-    "duffy_inv": DuffyInventory,
-    "dummy_inv": DummyInventory,
-    "gcloud_inv": GCloudInventory,
-    "libvirt_inv": LibvirtInventory,
-    "os_inv": OpenstackInventory,
-    "ovirt_inv": OvirtInventory,
+           "aws_inv": AWSInventory,
+           "beaker_inv": BeakerInventory,
+           "duffy_inv": DuffyInventory,
+           "dummy_inv": DummyInventory,
+           "gcloud_inv": GCloudInventory,
+           "libvirt_inv": LibvirtInventory,
+           "os_inv": OpenstackInventory,
+           "ovirt_inv": OvirtInventory,
 }
 
 

@@ -31,10 +31,6 @@
   set_fact:
     topology_outputs: "{{ db_out['output'] }}"
 
-- name: "hello"
-  debug:
-    msg: "{{ db_out['output'] }}"
-
 # parse inventory generation files here : can be overridden by extravar layout_file currently defaulted to openshift-3node-cluster.yml
 - name: "Parse inventory layout as a ordered dict"
   set_fact:

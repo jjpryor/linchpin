@@ -1,25 +1,16 @@
 ---
-# This playbook will initiate provisioning for the duffy resources groups.
-- name: "DEBUG:: Dummy resource group list"
-  debug:
-    msg: "Currently provisioning the resources under list dummy_res_grps {{ dummy_res_grps }}"
-
-- name: "Create a db entry"
-  hashlite:
-    file_path: "/tmp/testdb.json"
-    operation: "listcreate"
-    key: "{{ target_name }}_{{ runid }}"
-    subkey: "dummy_res"
-  when: state == "present"
-
 - name: "declaring output vars"
   set_fact:
     topology_outputs_dummy: []
 
+#- name: resource
+#  debug:
+#    var: resource
+
 - name: "Initiating Provisioning of dummy resource group"
   include: provision_resource_group.yml res_grp={{ item }}
   with_items:
-    - "{{ dummy_res_grps }}"
+    - "{{ resource }}"
   when: state == "present"
 
 - name: "Get latest run id with target "
@@ -41,4 +32,4 @@
   include: teardown_resource_group.yml res_grp={{ item }}
   with_items:
     - "{{ dummy_resources }}"
-  when: state== "absent"
+  when: state == "absent"

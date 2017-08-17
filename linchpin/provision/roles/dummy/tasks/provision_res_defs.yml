@@ -5,8 +5,32 @@
     name: "{{ res_def['res_name'] | default(res_def['name']) }}_{{ runid }}"
     count: "{{ res_def['count'] | default(1) }}"
   register: outputitem
-  when: res_def['resource_type']=="dummy_node"
+  when: res_def['type']=="dummy_node"
   ignore_errors: true
+
+- name: "Set fact for res_def output"
+  set_fact:
+    res_def_out:
+      output: "{{ outputitem }}"
+      resource_group_name: "{{ res_grp_name }}"
+      runid: "{{ runid }}"
+
+- name: Set fact for outputs inside res_def
+  set_fact:
+    ano: "{{ res_def | combine(res_def_out) }}"
+
+- name: "debug for ano"
+  debug:
+    msg: "{{ ano }}"
+
+- name: "Create entry for resource group parameters"
+  hashlite:
+    file_path: "/tmp/testdb.json"
+    operation: "listpush"
+    key: "{{ target_name }}_{{ runid }}"
+    subkey: "dummy_res"
+    value: "{{ ano | to_json }}"
+    datatype: "json"
 
 - name: "set tmp var"
   set_fact:

@@ -1,25 +1,5 @@
 ---
 
-#- name: "DEBUG:: layout_file"
-#  debug:
-#    msg: "{{ layout_file }}"
-#  when: state == "present"
-
-#- include_vars: "{{ resources_file | default( default_resources_path+'/'+
-#outputs.topology_name.replace(' ', '_').lower()+'.output' ) }}"
-
-#- name: "Updating topology_outputs"
-#  set_fact:
-#    topology_outputs:
-#      dummy_res: "{{ dummy_res }}"
-#      os_server_res: "{{ os_server_res }}"
-#      aws_ec2_res: "{{ aws_ec2_res }}"
-#      gcloud_gce_res: "{{ gcloud_gce_res }}"
-#      duffy_res: "{{ duffy_res }}"
-#      beaker_res: "{{ beaker_res }}"
-#      libvirt_res: "{{ libvirt_res }}"
-#  when: state == "present" and inventory_layout is defined
-
 - name: "Fetch outputs from db"
   hashlite:
     file_path: "/tmp/testdb.json"
@@ -40,7 +20,7 @@
 - name: "Updating inventory_path with the absolute path"
   set_fact:
     inventory_path: "{{ inventory_path | default( default_inventories_path+'/'+
-    outputs.topology_name.replace(' ', '_').lower() ) }}.inventory"
+    topology_name.replace(' ', '_').lower() ) }}.inventory"
 
 #- name: inventory_layout
 #  debug:

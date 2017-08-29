@@ -2,10 +2,10 @@
 - name: "Provision dummy resources by looping on count"
   dummy:
     state: present
-    name: "{{ res_def['res_name'] | default(res_def['name']) }}_{{ runid }}"
+    name: "{{ res_def['res_name'] | default(res_def['name']) }}"
     count: "{{ res_def['count'] | default(1) }}"
   register: outputitem
-  when: res_def['resource_type']=="dummy_node"
+  when: res_def['type']=="dummy_node"
   ignore_errors: true
 
 - name: "Set fact for res_def output"
@@ -27,7 +27,7 @@
   hashlite:
     file_path: "/tmp/testdb.json"
     operation: "listpush"
-    key: "{{ target }}_{{ runid }}"
+    key: "{{ target_name }}_{{ runid }}"
     subkey: "dummy_res"
     value: "{{ ano | to_json }}"
     datatype: "json"

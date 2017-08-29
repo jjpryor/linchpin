@@ -33,3 +33,6 @@ nosetests.xml
 .idea
 .pydevproject
 
+
+# sshfs files
+.fuse_hidden*

@@ -1,7 +1,7 @@
 ---
 - name: debug
   debug:
-    msg: "{{ target }}"
+    msg: "{{ target_name }}"
 
 - name: "Teardown dummy resources by looping on count"
   dummy:

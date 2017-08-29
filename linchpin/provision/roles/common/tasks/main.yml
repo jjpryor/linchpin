@@ -14,7 +14,7 @@
 
 - name: "TARGET NAME DEBUG"
   debug:
-    msg: "{{ target }}"
+    msg: "{{ target_name }}"
 
 - name: "generate runid"
   shell: "python -c 'from uuid import getnode as get_mac; print get_mac()'"
@@ -26,6 +26,7 @@
   register: timestamp_output
   when: state == 'present'
 
+
 - name: "set fact for runid"
   set_fact:
     runid: "{{ runid | default(macid_output['stdout']+'_'+timestamp_output['stdout']) }}"
@@ -35,14 +36,14 @@
   hashlite:
     file_path: "/tmp/testdb.json"
     operation: "dictcreate"
-    key: "{{ target }}_{{ runid }}"
+    key: "{{ target_name }}_{{ runid }}"
   when: state == 'present'
 
 - name: "Create a entries for topology name"
   hashlite:
     file_path: "/tmp/testdb.json"
     operation: "set"
-    key: "{{ target }}_{{ runid }}"
+    key: "{{ target_name }}_{{ runid }}"
     subkey: "topology_name"
     value: "{{ topology_name }}"
   when: state == 'present'
@@ -55,8 +56,8 @@
     subkey: "{{ item[0] }}"
     force: true
   with_nested:
-    - ["aws_ec2_res", "os_server_res", "gcloud_gce_res", "rax_server_res", "libvirt_res", "duffy_res", "dummy_res", "ovirt_vms_res"]
-    - ["{{ target }}_{{ runid }}"]
+    - ["aws_ec2_res", "os_server_res", "gcloud_gce_res", "rax_server_res", "libvirt_res", "duffy_res", "dummy_res"]
+    - ["{{ target_name }}_{{ runid }}"]
   when: state == 'present'
 
 - name: "load ini evars from linchpin.conf"

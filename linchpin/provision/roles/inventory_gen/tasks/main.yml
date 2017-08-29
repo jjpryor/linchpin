@@ -2,9 +2,9 @@
 
 - name: "Fetch outputs from db"
   hashlite:
-    file_path: "/tmp/testdb.json"
+    file_path: "/tmp/rundb.json"
     operation: "get"
-    key: "{{ target_name }}_{{ runid }}"
+    key: "{{ target }}_{{ runid }}"
   register: db_out
 
 - name: "register topology_outputs"

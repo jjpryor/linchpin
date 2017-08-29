@@ -12,10 +12,6 @@
 #  debug:
 #    var: from_api
 
-- name: "TARGET NAME DEBUG"
-  debug:
-    msg: "{{ target_name }}"
-
 - name: "generate runid"
   shell: "python -c 'from uuid import getnode as get_mac; print get_mac()'"
   register: macid_output
@@ -34,30 +30,30 @@
 
 - name: "Create a db entry"
   hashlite:
-    file_path: "/tmp/testdb.json"
+    file_path: "/tmp/rundb.json"
     operation: "dictcreate"
-    key: "{{ target_name }}_{{ runid }}"
+    key: "{{ target }}_{{ runid }}"
   when: state == 'present'
 
 - name: "Create a entries for topology name"
   hashlite:
-    file_path: "/tmp/testdb.json"
+    file_path: "/tmp/rundb.json"
     operation: "set"
-    key: "{{ target_name }}_{{ runid }}"
+    key: "{{ target }}_{{ runid }}"
     subkey: "topology_name"
     value: "{{ topology_name }}"
   when: state == 'present'
 
 - name: "create lists for all resource types"
   hashlite:
-    file_path: "/tmp/testdb.json"
+    file_path: "/tmp/rundb.json"
     operation: listcreate
     key: "{{ item[1] }}"
     subkey: "{{ item[0] }}"
     force: true
   with_nested:
-    - ["aws_ec2_res", "os_server_res", "gcloud_gce_res", "rax_server_res", "libvirt_res", "duffy_res", "dummy_res"]
-    - ["{{ target_name }}_{{ runid }}"]
+    - ["aws_ec2_res", "os_server_res", "gcloud_gce_res", "rax_server_res", "libvirt_res", "duffy_res", "dummy_res", 'ovirt_vms_res']
+    - ["{{ target }}_{{ runid }}"]
   when: state == 'present'
 
 - name: "load ini evars from linchpin.conf"

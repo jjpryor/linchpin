@@ -15,9 +15,9 @@
 
 - name: "Get latest run id with target "
   hashlite:
-    file_path: "/tmp/testdb.json"
+    file_path: "/tmp/rundb.json"
     operation: getfirst
-    key: "{{ target_name }}_*"
+    key: "{{ target }}_*"
     subkey: "dummy_res"
   register: dummy_res
   when: state == "absent"

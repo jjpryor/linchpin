@@ -506,6 +506,7 @@ class LinchpinAPI(object):
             # validate the topology and return a list of resources to act upon
             resources = self.validate_topology(topology_file) #HERE
             self.set_evar('topology_file', topology_file)
+            self.set_evar('target', target)
 
             if 'layout' in pf[target]:
                 self.set_evar('layout_file',

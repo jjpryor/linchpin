@@ -17,7 +17,7 @@
   hashlite:
     file_path: "/tmp/testdb.json"
     operation: getfirst
-    key: "{{ target_name }}_*"
+    key: "{{ target }}_*"
     subkey: "dummy_res"
   register: dummy_res
   when: state == "absent"

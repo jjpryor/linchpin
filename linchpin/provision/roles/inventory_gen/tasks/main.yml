@@ -4,7 +4,7 @@
   hashlite:
     file_path: "/tmp/testdb.json"
     operation: "get"
-    key: "{{ target_name }}_{{ runid }}"
+    key: "{{ target }}_{{ runid }}"
   register: db_out
 
 - name: "register topology_outputs"

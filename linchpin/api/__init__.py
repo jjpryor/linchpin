@@ -567,7 +567,7 @@ class LinchpinAPI(object):
                                                      'library'))
 
         for resource in resources:
-            playbook = resource.get('resource_group_name')
+            playbook = resource.get('resource_group_type')
             playbook_path = '{0}/{1}.yml'.format(self.pb_path, playbook)
 
             loader = DataLoader()

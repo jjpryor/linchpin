@@ -259,7 +259,9 @@ class LinchpinAPI(object):
             A tuple of targets to provision.
         """
 
-        return self._do_action(pinfile, targets, action="up")
+        results = self._do_action(pinfile, targets, action="up")
+
+        return results
 
 
     def lp_drop(self, pinfile, targets):
@@ -531,15 +533,10 @@ class LinchpinAPI(object):
                 self.hook_state = '{0}{1}'.format('pre', action)
 
             # invoke the appropriate action
-            return_code, results[target] = (
+            results[target] = (
                 self._invoke_playbooks(resources, action=action,
                                       console=ansible_console)
             )
-
-            # if return_code is 0 (Success)
-            if not return_code:
-                self.ctx.log_state("Action '{0}' on Target '{1}' is "
-                                   "complete".format(action, target))
 
             # FIXME Check the result[target] value here, and fail if applicable.
             # It's possible that a flag might allow more targets to run, then
@@ -548,7 +545,7 @@ class LinchpinAPI(object):
             if 'post' in self.pb_hooks:
                 self.hook_state = '{0}{1}'.format('post', action)
 
-        return (return_code, results)
+        return results
 
 
     def _invoke_playbooks(self, resources, action='up', console=True):
@@ -566,8 +563,11 @@ class LinchpinAPI(object):
                                                      'module_folder',
                                                      'library'))
 
+        resources_results = {}
+
         for resource in resources:
             playbook = resource.get('resource_group_type')
+            resource_group_name = resource.get('resource_group_name')
             playbook_path = '{0}/{1}.yml'.format(self.pb_path, playbook)
 
             loader = DataLoader()
@@ -626,20 +626,20 @@ class LinchpinAPI(object):
                                     options=options,
                                     passwords=passwords)
 
-            if not console:
-                results = {}
-                return_code = 0
+            resources_results[resource_group_name] = {}
 
+            if not console:
                 cb = PlaybookCallback()
 
                 with suppress_stdout():
                     pbex._tqm._stdout_callback = cb
 
-                return_code = pbex.run()
-                results = cb.results
+                resources_results[resource_group_name]['results'] = cb.results
+                resources_results[resource_group_name]['rc'] = pbex.run()
 
-                return return_code, results
             else:
                 # the console only returns a return_code
-                return_code = pbex.run()
-                return return_code, None
+                resources_results[resource_group_name]['rc'] = pbex.run()
+
+        return resources_results
+

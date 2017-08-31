@@ -48,7 +48,7 @@ class LinchpinAliases(click.Group):
         return rv
 
 
-def _handle_results(ctx, results, return_code):
+def _handle_results(ctx, return_data, action='up'):
     """
     Handle results from the Ansible API. Either as a return value (retval)
     when running with the ansible console enabled, or as a list of TaskResult
@@ -62,23 +62,40 @@ def _handle_results(ctx, results, return_code):
         The dictionary of results for each target.
     """
 
-    for k, v in results.iteritems():
-        if not isinstance(v, int):
-            trs = v
+    errors = []
+    return_code = 0
+
+    for target, groups in return_data.iteritems():
+#        print('target: {}\n res: {}\n\n'.format(target, results))
+
+        for name, results in groups.iteritems():
+#            print('name: {}\n res: {}\n\n\n'.format(name, results))
+
+            trs = results['results']
+            rc = results['rc']
+#            print('trs: {}\n rc: {}'.format(trs, rc))
 
             if trs is not None:
                 trs.reverse()
-                tr = trs[0]
-                if tr.is_failed():
-                    msg = tr._check_key('msg')
-                    ctx.log_state("Target '{0}': {1} failed with"
-                                  " error '{2}'".format(k, tr._task, msg))
-                    sys.exit(return_code)
-            elif return_code:
-                sys.exit(return_code)
-        else:
-            if v:
-                sys.exit(v)
+                for tr in trs:
+                    if tr.is_failed():
+                        msg = tr._check_key('msg')
+                        errors.append("Target '{0}': {1} failed with"
+                                      " error '{2}'".format(target,
+                                                            tr._task,
+                                                            msg))
+
+            if rc:
+                return_code = rc
+
+        for err in errors:
+            ctx.log_state(err)
+
+    if not return_code:
+        ctx.log_state("Action '{0}' on Target '{1}' is "
+                      "complete".format(action, target))
+
+    sys.exit(return_code)
 
 
 @click.group(cls=LinchpinAliases,
@@ -225,9 +242,9 @@ def up(ctx, targets):
     pf_w_path = _get_pinfile_path()
 
     try:
-        return_code, results = lpcli.lp_up(pf_w_path, targets)
+        results = lpcli.lp_up(pf_w_path, targets)
 
-        _handle_results(ctx, results, return_code)
+        _handle_results(ctx, results, 'up')
 
     except LinchpinError as e:
         ctx.log_state(e)

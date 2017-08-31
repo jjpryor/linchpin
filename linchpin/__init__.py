@@ -286,9 +286,9 @@ def destroy(ctx, targets):
     pf_w_path = _get_pinfile_path()
 
     try:
-        return_code, results = lpcli.lp_destroy(pf_w_path, targets)
+        results = lpcli.lp_destroy(pf_w_path, targets)
 
-        _handle_results(ctx, results, return_code)
+        _handle_results(ctx, results, 'destroy')
 
     except LinchpinError as e:
         ctx.log_state(e)

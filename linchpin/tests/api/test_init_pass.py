@@ -20,6 +20,7 @@ def test_api_create():
 
     lpc = LinchpinContext()
     lpc.load_config()
+    lpc.load_global_evars()
     lpa = LinchpinAPI(lpc)
 
     assert_equal(isinstance(lpa, LinchpinAPI), True)
@@ -165,7 +166,7 @@ def test_set_evar():
 
     for k, v in test_evars.items():
         lpa.set_evar(k, v)
-    lpa_evars = lpa.get_cfg('evars')
+    lpa_evars = lpa.get_evar()
 
     assert_dict_contains_subset(test_evars, lpa_evars)
 
@@ -192,32 +193,62 @@ def test_get_evar_item():
     assert_equal(lpa.get_evar(key='ekey2'), test_evars.get('ekey2'))
 
 
-#def setup_lp_api():
+def _handle_do_action_results(return_data):
+
+    errors = []
+    return_code = 0
+
+    for target, groups in return_data.iteritems():
+        for name, results in groups.iteritems():
+            trs = results['results']
+            rc = results['rc']
+
+            if trs is not None:
+                trs.reverse()
+                for tr in trs:
+                    if tr.is_failed():
+                        msg = tr._check_key('msg')
+                        errors.append("Target '{0}': {1} failed with"
+                                      " error '{2}'".format(target,
+                                                            tr._task,
+                                                            msg))
+
+            if rc:
+                return_code = rc
+
+#        for err in errors:
+#            ctx.log_state(err)
 #
-#    """
-#    Perform setup of LinchpinContext, lpc.load_config, and LinchPinAPI
-#    """
-#
-#    global lpc
-#    global lpa
-#
-#    lpc = LinchpinContext()
-#    lpc.load_config()
-#    lpa = LinchpinAPI(lpc)
+#    if not return_code:
+#        ctx.log_state("Action '{0}' on Target '{1}' is "
+#                      "complete".format(action, target))
+
+    return return_code
+
 
 @with_setup(setup_lp_api)
-def test_run_playbook():
+def test_do_action_up():
 
     pf_w_path = '{0}/{1}'.format(lpc.workspace, pinfile)
-    return_code, results = lpa.run_playbook(pf_w_path, targets=[provider])
+    results = lpa._do_action(pf_w_path, targets=[provider], action='up')
 
-    for res in results[provider]:
-        name = res._task.get_name()
-        failed = False
-        if res.is_failed():
-            failed = True
+    rc = _handle_do_action_results(results)
 
-    assert not failed
+    # rc should return 0
+    assert not rc
+
+
+@with_setup(setup_lp_api)
+def test_do_action_destroy():
+
+    pf_w_path = '{0}/{1}'.format(lpc.workspace, pinfile)
+    results = lpa._do_action(pf_w_path, targets=[provider], action='destroy')
+
+    rc = _handle_do_action_results(results)
+
+    # rc should return 0
+    assert not rc
+
 
 @with_setup(setup_lp_fetch_env)
 def test_fetch_local():

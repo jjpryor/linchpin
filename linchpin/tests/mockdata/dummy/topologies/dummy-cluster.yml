@@ -7,5 +7,5 @@ resource_groups:
     resource_definitions:
       -
         name: "web"
-        type: "dummy_node"
+        resource_type: "dummy_node"
         count: 3

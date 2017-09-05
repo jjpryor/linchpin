@@ -61,8 +61,8 @@ class LinchpinAPI(object):
                            default='linchpin')
         self.lp_path = '{0}/{1}'.format(base_path, pkg)
         self.pb_path = '{0}/{1}'.format(self.lp_path,
-                                   self.ctx.get_evar('playbooks_folder',
-                                                     'provision'))
+                                        self.get_evar('playbooks_folder',
+                                                      default='provision'))
 
         self.set_evar('from_api', True)
 
@@ -123,7 +123,7 @@ class LinchpinAPI(object):
         (default: None)
         """
 
-        return self.ctx.get_evar(key, default)
+        return self.ctx.get_evar(key, default=default)
 
 
     def set_evar(self, key, value):
@@ -371,7 +371,7 @@ class LinchpinAPI(object):
         topo_path = os.path.realpath('{0}/{1}'.format(
                                      self.ctx.workspace,
                                      self.get_evar('topologies_folder',
-                                                   'topologies')))
+                                                   default='topologies')))
 
         topos = os.listdir(topo_path)
 
@@ -399,13 +399,6 @@ class LinchpinAPI(object):
 
         ;param topology: Full path to topology for validation
         """
-
-        #self.pb_path = '{0}/{1}'.format(self.lp_path,
-        #                           self.ctx.get_evar('playbooks_folder',
-        #                                             'provision'))
-
-        #_schema self.pb_path
-
 
         with open(topology) as fd:
             topology_data = yaml.safe_load(fd)
@@ -510,12 +503,13 @@ class LinchpinAPI(object):
             self.set_evar('topology_file', topology_file)
             self.set_evar('target', target)
 
+
+            layout_file = '{0}/{1}/{2}'.format(self.ctx.workspace,
+                                               self.get_evar('layouts_folder'),
+                                               pf[target]["layout"])
+
             if 'layout' in pf[target]:
-                self.set_evar('layout_file',
-                              '{0}/{1}/{2}'.format(self.ctx.workspace,
-                                                   self.get_evar(
-                                                       'layouts_folder'),
-                                                   pf[target]["layout"]))
+                self.set_evar('layout_file', layout_file)
 
             # parse topology_file and set inventory_file
             # FIXME we open the topology_file more than once now
@@ -535,7 +529,7 @@ class LinchpinAPI(object):
             # invoke the appropriate action
             results[target] = (
                 self._invoke_playbooks(resources, action=action,
-                                      console=ansible_console)
+                                       console=ansible_console)
             )
 
             # FIXME Check the result[target] value here, and fail if applicable.

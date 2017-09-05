@@ -4,7 +4,6 @@ import os
 import sys
 import click
 import json
-import pprint
 
 from linchpin.cli import LinchpinCli
 from linchpin.exceptions import LinchpinError

@@ -8,7 +8,6 @@ try:
 except ImportError:
     from ConfigParser import ConfigParser
 import StringIO
-import pprint
 
 
 def get_host_ips(topo):

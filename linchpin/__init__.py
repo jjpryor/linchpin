@@ -66,14 +66,9 @@ def _handle_results(ctx, return_data, action='up'):
     return_code = 0
 
     for target, groups in return_data.iteritems():
-#        print('target: {}\n res: {}\n\n'.format(target, results))
-
         for name, results in groups.iteritems():
-#            print('name: {}\n res: {}\n\n\n'.format(name, results))
-
             trs = results['results']
             rc = results['rc']
-#            print('trs: {}\n rc: {}'.format(trs, rc))
 
             if trs is not None:
                 trs.reverse()
@@ -179,14 +174,14 @@ def history(ctx):
     try:
         fpath = ctx.get_cfg("database").get("path")
         db = json.loads(open(fpath, "r").read())
-        print("==============")
-        print("RUNID")
-        print("==============")
+        ctx.log_state("==============")
+        ctx.log_state("RUNID")
+        ctx.log_state("==============")
         for key in db.keys():
-            print(key)
+            ctx.log_state(key)
     except Exception as e:
-        print(e)
-        print("DB file not found")
+        ctx.log_state(e)
+        ctx.log_state("DB file not found")
     #pf_w_path = _get_pinfile_path(exists=False)
     #try:
     #    # lpcli.lp_init(pf_w_path, targets) # TODO implement targets option
@@ -206,17 +201,17 @@ def show(ctx, runid):
     try:
         fpath = ctx.get_cfg("database").get("path")
         db = json.loads(open(fpath, "r").read())
-        print("==============")
-        print("Resources")
-        print("==============")
+        ctx.log_state("==============")
+        ctx.log_state("Resources")
+        ctx.log_state("==============")
         output = db.get(runid, False)
         if output == False:
-            print("RUNID not found")
+            ctx.log_state("RUNID not found")
         else:
-            pprint.pprint(output)
+            ctx.log_state(output)
     except Exception as e:
-        print(e)
-        print("DB file not found")
+        ctx.log_state(e)
+        ctx.log_state("DB file not found")
     except LinchpinError as e:
         ctx.log_state(e)
         sys.exit(1)
